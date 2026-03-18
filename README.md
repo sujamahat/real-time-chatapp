@@ -1,7 +1,7 @@
 <div align="center">
   <h1>Pulse Chat</h1>
-  <p><strong>A polished full-stack real-time chat application built with React, Express, Socket.IO, Prisma, and PostgreSQL.</strong></p>
-  <p>Designed as a portfolio-quality project that demonstrates product UI, realtime systems, authentication, database modeling, file uploads, and deployment-ready architecture.</p>
+  <p><strong>A full-stack real-time chat app built with React, Express, Socket.IO, Prisma, and PostgreSQL.</strong></p>
+  <p>I built this project to practice what it actually feels like to ship a small real-time product end to end: auth, live messaging, file uploads, read receipts, deployment, and all the little issues that show up along the way.</p>
 </div>
 
 <div align="center">
@@ -55,16 +55,16 @@ Use these credentials to test the live app:
 - The backend link in this README points to a health-check endpoint, because the backend is an API service rather than a browser-facing page
 - The project is deployed with Vercel for the frontend and Railway for the backend
 
-## Why This Project Stands Out
+## Why I Built This
 
-- Real-time messaging powered by Socket.IO
-- Direct messages with live presence states
-- Read receipts and unread count tracking
-- Attachment uploads with local or S3-compatible storage
-- JWT cookie authentication
-- Prisma + PostgreSQL data modeling
-- Redis-backed rate limiting for auth, uploads, and message flow
-- Docker, Railway, and Vercel friendly setup
+I did not want this to be just another "send a message and watch it appear" demo. I wanted something that felt closer to a real product, so I added the pieces that usually make these apps harder and more interesting:
+
+- real-time messaging with Socket.IO
+- direct messages and presence states
+- read receipts and unread counts
+- attachment uploads
+- auth and session handling
+- rate limiting and deployment setup
 
 ## Preview
 
@@ -76,17 +76,17 @@ Use these credentials to test the live app:
   <img src="apps/server/docs/screenshots/pulse-chat-dm.png" alt="Pulse Chat direct message view" width="100%" />
 </p>
 
-## Portfolio Impact
+## What This Project Covers
 
-- Built a production-shaped realtime chat product instead of a toy messaging demo
-- Combined REST APIs and WebSocket events in one coherent application architecture
-- Implemented authentication, unread counts, read receipts, DMs, uploads, and rate limiting
-- Structured the app as a monorepo with separate frontend, backend, and shared type layers
-- Prepared the project for local Docker workflows and cloud deployment targets
+- Building a real-time product instead of a toy chat demo
+- Combining REST APIs and WebSocket events in one app
+- Handling auth, uploads, receipts, unread counts, and DMs
+- Structuring a small monorepo with frontend, backend, and shared types
+- Deploying the app and dealing with production-only issues
 
 ## Product Vision
 
-Pulse Chat was designed to feel like a lightweight modern collaboration tool rather than just a CRUD demo. The goal was to build something that proves real product thinking:
+Pulse Chat was meant to feel like a lightweight collaboration tool instead of a CRUD project wearing a chat UI. I wanted the app to feel simple to use while still covering the kinds of engineering problems that come up in real-time apps:
 
 - fast realtime communication
 - clear separation between channels and direct messages
@@ -167,25 +167,25 @@ packages/
 
 ## What I Built
 
-- A polished multi-panel chat interface with both channels and DMs
-- A realtime event pipeline using Socket.IO for messaging, typing, receipts, and presence
-- A relational Prisma schema for chat rooms, memberships, messages, and read states
-- Attachment upload handling with support for local storage or S3-compatible storage
-- Production-minded protections like rate limiting and deployment-ready configuration
+- A chat UI with channels, direct messages, unread badges, and read receipts
+- A Socket.IO event flow for messages, typing indicators, presence, and receipts
+- A Prisma/Postgres data model for rooms, memberships, messages, and read state
+- File upload support for local storage and S3-compatible storage
+- Production setup for Vercel, Railway, Redis, and Docker
 
 ## Engineering Challenges
 
 ### 1. Keeping realtime state and API state aligned
 
-The app mixes REST endpoints and Socket.IO events. That creates a common challenge: some state arrives through HTTP and some arrives through live events. I handled this by keeping shared types in a central package and making the frontend update room lists, unread counts, and message history from both API responses and socket events.
+This app mixes REST endpoints and Socket.IO events, which means some state comes from HTTP and some comes from live events. Keeping those in sync was one of the trickiest parts. I handled that by using shared types and making the frontend update room lists, unread counts, and message history from both API responses and socket events.
 
 ### 2. Designing chat data for both channels and DMs
 
-Rather than building separate message systems, the app models both channels and direct messages through the room system. That keeps the backend simpler while still allowing different UI behavior and metadata for each conversation type.
+Instead of building two completely separate systems, I modeled both channels and direct messages through the room layer. That kept the backend simpler while still letting the UI treat those conversation types differently.
 
 ### 3. Moving beyond a toy demo
 
-A lot of chat demos stop at “messages appear instantly.” This project goes further by including unread counts, read receipts, file uploads, presence, and rate limiting, which makes the system feel closer to a real product.
+A lot of chat demos stop at "messages appear instantly." I wanted this one to go further, so I added unread counts, read receipts, uploads, presence, and rate limiting. Those features added complexity, but they also made the app feel much more real.
 
 ## Tradeoffs
 
@@ -196,11 +196,11 @@ A lot of chat demos stop at “messages appear instantly.” This project goes f
 
 ## What I Learned
 
-- How to model realtime collaboration data without losing API clarity
+- How to model real-time app data without making the API messy
 - How to keep frontend and backend contracts aligned with shared TypeScript types
-- How to combine REST endpoints with WebSocket events in the same product
-- How to structure a small monorepo for frontend, backend, and shared packages
-- How to design a chat UI that feels polished while still being practical to ship
+- How much smoother development feels when deployment and local setup are planned early
+- How many production bugs are really environment and browser issues, not just code issues
+- How to make a project feel more like a product and less like a tutorial
 
 ## If I Had More Time
 
