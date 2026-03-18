@@ -14,6 +14,7 @@ import type {
 import { AuthCard } from "./components/AuthCard";
 import { RoomSidebar } from "./components/RoomSidebar";
 import { ChatPanel } from "./components/ChatPanel";
+import { CreateRoomModal } from "./components/CreateRoomModal";
 import { apiFetch } from "./lib/api";
 import { getSocket } from "./lib/socket";
 
@@ -27,6 +28,9 @@ export function App() {
   const [typingByRoom, setTypingByRoom] = useState<Record<string, TypingState>>({});
   const [presenceByUserId, setPresenceByUserId] = useState<Record<string, boolean>>({});
   const [loadingSession, setLoadingSession] = useState(true);
+  const [isCreateRoomOpen, setIsCreateRoomOpen] = useState(false);
+  const [isCreatingRoom, setIsCreatingRoom] = useState(false);
+  const [createRoomError, setCreateRoomError] = useState<string | null>(null);
   const hasConnectedSocket = useRef(false);
   const activeRoomIdRef = useRef<string | null>(null);
   const userRef = useRef<AppUser | null>(null);
@@ -283,19 +287,36 @@ export function App() {
     await Promise.all([loadRooms(), loadUsers()]);
   }
 
-  async function handleCreateRoom() {
-    const name = window.prompt("Name your new room");
-
-    if (!name) {
+  async function handleCreateRoom(values: { name: string; description: string }) {
+    if (!values.name) {
+      setCreateRoomError("Give the channel a name so your team can find it.");
       return;
     }
 
-    await apiFetch<{ room: ChatRoom }>("/rooms", {
-      method: "POST",
-      body: JSON.stringify({ name })
-    });
+    setIsCreatingRoom(true);
+    setCreateRoomError(null);
 
-    await loadRooms();
+    try {
+      const data = await apiFetch<{ room: ChatRoom }>("/rooms", {
+        method: "POST",
+        body: JSON.stringify({
+          name: values.name,
+          description: values.description || undefined
+        })
+      });
+
+      await loadRooms();
+      await selectRoom(data.room.id);
+      setIsCreateRoomOpen(false);
+    } catch (error) {
+      setCreateRoomError(
+        error instanceof Error
+          ? error.message
+          : "We could not create the channel. Please try again."
+      );
+    } finally {
+      setIsCreatingRoom(false);
+    }
   }
 
   async function handleStartDirectMessage(targetUserId: string) {
@@ -401,7 +422,10 @@ export function App() {
         presenceByUserId={presenceByUserId}
         activeRoomId={activeRoomId}
         onSelectRoom={(roomId) => void selectRoom(roomId)}
-        onCreateRoom={() => void handleCreateRoom()}
+        onCreateRoom={() => {
+          setCreateRoomError(null);
+          setIsCreateRoomOpen(true);
+        }}
         onStartDirectMessage={handleStartDirectMessage}
         onLogout={handleLogout}
       />
@@ -428,6 +452,21 @@ export function App() {
           presenceByUserId={presenceByUserId}
         />
       </div>
+
+      <CreateRoomModal
+        isOpen={isCreateRoomOpen}
+        isSubmitting={isCreatingRoom}
+        errorMessage={createRoomError}
+        onClose={() => {
+          if (isCreatingRoom) {
+            return;
+          }
+
+          setCreateRoomError(null);
+          setIsCreateRoomOpen(false);
+        }}
+        onSubmit={handleCreateRoom}
+      />
     </main>
   );
 }
