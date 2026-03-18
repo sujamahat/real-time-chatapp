@@ -1,10 +1,21 @@
 import jwt from "jsonwebtoken";
-import type { Response } from "express";
+import type { CookieOptions, Response } from "express";
 import { env } from "../env.js";
 
 type TokenPayload = {
   userId: string;
 };
+
+function getCookieOptions(): CookieOptions {
+  const isProduction = env.NODE_ENV === "production";
+
+  return {
+    httpOnly: true,
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction,
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  };
+}
 
 export function signToken(userId: string) {
   return jwt.sign({ userId }, env.JWT_SECRET, {
@@ -17,19 +28,10 @@ export function verifyToken(token: string) {
 }
 
 export function setAuthCookie(response: Response, token: string) {
-  response.cookie(env.COOKIE_NAME, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: env.NODE_ENV === "production",
-    maxAge: 7 * 24 * 60 * 60 * 1000
-  });
+  response.cookie(env.COOKIE_NAME, token, getCookieOptions());
 }
 
 export function clearAuthCookie(response: Response) {
-  response.clearCookie(env.COOKIE_NAME, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: env.NODE_ENV === "production"
-  });
+  const { maxAge: _maxAge, ...cookieOptions } = getCookieOptions();
+  response.clearCookie(env.COOKIE_NAME, cookieOptions);
 }
-
