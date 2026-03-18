@@ -12,6 +12,10 @@ export type AuthenticatedRequest = Request & {
   };
 };
 
+export function getAuthenticatedUser(request: Request) {
+  return (request as Request & AuthenticatedRequest).user;
+}
+
 export async function requireAuth(
   request: Request,
   response: Response,
@@ -46,4 +50,3 @@ export async function requireAuth(
     });
   }
 }
-

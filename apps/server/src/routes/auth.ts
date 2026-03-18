@@ -6,14 +6,14 @@ import { env } from "../env.js";
 import { prisma } from "../lib/prisma.js";
 import { clearAuthCookie, setAuthCookie, signToken } from "../lib/auth.js";
 import { createRateLimitMiddleware } from "../lib/rateLimit.js";
-import { requireAuth, type AuthenticatedRequest } from "../middleware/auth.js";
+import { getAuthenticatedUser, requireAuth } from "../middleware/auth.js";
 
 const router = Router();
 const authRateLimit = createRateLimitMiddleware({
   keyPrefix: "auth",
   limit: env.AUTH_RATE_LIMIT_MAX,
   windowMs: env.AUTH_RATE_LIMIT_WINDOW_MS,
-  getKey: (request) => request.ip
+  getKey: (request) => request.ip ?? "unknown"
 });
 
 const authSchema = z.object({
@@ -125,7 +125,7 @@ router.post("/logout", (_request, response) => {
 });
 
 router.get("/me", requireAuth, (request, response) => {
-  const user = (request as AuthenticatedRequest).user;
+  const user = getAuthenticatedUser(request);
   return response.json({
     user
   });

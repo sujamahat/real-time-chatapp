@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { prisma } from "../lib/prisma.js";
-import { requireAuth, type AuthenticatedRequest } from "../middleware/auth.js";
+import { getAuthenticatedUser, requireAuth } from "../middleware/auth.js";
 import { serializeRoom } from "../lib/serializers.js";
 
 const router = Router();
@@ -9,7 +9,7 @@ const router = Router();
 router.use(requireAuth);
 
 router.post("/:userId", async (request, response) => {
-  const currentUserId = (request as AuthenticatedRequest).user.id;
+  const currentUserId = getAuthenticatedUser(request).id;
   const targetUserId = request.params.userId;
 
   if (currentUserId === targetUserId) {
@@ -63,4 +63,3 @@ router.post("/:userId", async (request, response) => {
 });
 
 export const directsRouter = router;
-

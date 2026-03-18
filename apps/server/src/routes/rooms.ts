@@ -2,7 +2,7 @@ import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
-import { requireAuth, type AuthenticatedRequest } from "../middleware/auth.js";
+import { getAuthenticatedUser, requireAuth } from "../middleware/auth.js";
 import { serializeRoom } from "../lib/serializers.js";
 
 const router = Router();
@@ -15,7 +15,7 @@ const createRoomSchema = z.object({
 router.use(requireAuth);
 
 router.get("/", async (request, response) => {
-  const userId = (request as AuthenticatedRequest).user.id;
+  const userId = getAuthenticatedUser(request).id;
   const unreadGroups = await prisma.message.groupBy({
     by: ["roomId"],
     where: {
@@ -101,7 +101,7 @@ router.post("/", async (request, response) => {
     });
   }
 
-  const userId = (request as AuthenticatedRequest).user.id;
+  const userId = getAuthenticatedUser(request).id;
 
   const room = await prisma.room.create({
     data: {
@@ -135,7 +135,7 @@ router.post("/", async (request, response) => {
 });
 
 router.post("/:roomId/join", async (request, response) => {
-  const userId = (request as AuthenticatedRequest).user.id;
+  const userId = getAuthenticatedUser(request).id;
   const { roomId } = request.params;
 
   const room = await prisma.room.findUnique({

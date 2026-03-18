@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { prisma } from "../lib/prisma.js";
-import { requireAuth, type AuthenticatedRequest } from "../middleware/auth.js";
+import { getAuthenticatedUser, requireAuth } from "../middleware/auth.js";
 import { serializeMessage } from "../lib/serializers.js";
 import { markRoomAsRead } from "../lib/readReceipts.js";
 
@@ -10,7 +10,7 @@ const router = Router();
 router.use(requireAuth);
 
 router.get("/:roomId", async (request, response) => {
-  const userId = (request as AuthenticatedRequest).user.id;
+  const userId = getAuthenticatedUser(request).id;
   const { roomId } = request.params;
   const cursor = typeof request.query.cursor === "string" ? request.query.cursor : null;
 
@@ -68,7 +68,7 @@ router.get("/:roomId", async (request, response) => {
 });
 
 router.post("/:roomId/read", async (request, response) => {
-  const userId = (request as AuthenticatedRequest).user.id;
+  const userId = getAuthenticatedUser(request).id;
   const { roomId } = request.params;
 
   const membership = await prisma.roomMember.findUnique({

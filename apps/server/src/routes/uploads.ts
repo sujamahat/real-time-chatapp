@@ -13,7 +13,7 @@ router.use(
     keyPrefix: "upload",
     limit: env.UPLOAD_RATE_LIMIT_MAX,
     windowMs: env.UPLOAD_RATE_LIMIT_WINDOW_MS,
-    getKey: (request) => request.ip
+    getKey: (request) => request.ip ?? "unknown"
   })
 );
 

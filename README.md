@@ -16,11 +16,11 @@
 </div>
 
 <div align="center">
-  <sub>Add a live demo link here when deployed.</sub>
+  <sub>Live now on Vercel + Railway.</sub>
 </div>
 
 <div align="center">
-  <a href="#"><strong>Live Demo</strong></a>
+  <a href="https://real-time-chatapp-eight.vercel.app"><strong>Live Demo</strong></a>
   ·
   <a href="#getting-started"><strong>Run Locally</strong></a>
   ·
@@ -28,6 +28,11 @@
   ·
   <a href="#resume-friendly-talking-points"><strong>Resume Points</strong></a>
 </div>
+
+## Live Deployment
+
+- Frontend: https://real-time-chatapp-eight.vercel.app
+- Backend API: https://backend-production-e34e.up.railway.app
 
 ## Why This Project Stands Out
 
