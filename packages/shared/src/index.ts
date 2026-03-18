@@ -59,6 +59,7 @@ export type DirectoryUser = {
 
 export type AuthResponse = {
   user: AppUser;
+  token?: string;
 };
 
 export type PaginatedMessages = {

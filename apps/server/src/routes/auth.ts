@@ -73,7 +73,7 @@ router.post("/register", authRateLimit, async (request, response) => {
   const token = signToken(user.id);
   setAuthCookie(response, token);
 
-  return response.status(StatusCodes.CREATED).json({ user });
+  return response.status(StatusCodes.CREATED).json({ user, token });
 });
 
 router.post("/login", authRateLimit, async (request, response) => {
@@ -115,7 +115,8 @@ router.post("/login", authRateLimit, async (request, response) => {
       email: user.email,
       name: user.name,
       createdAt: user.createdAt
-    }
+    },
+    token
   });
 });
 

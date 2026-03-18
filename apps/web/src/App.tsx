@@ -16,7 +16,12 @@ import { RoomSidebar } from "./components/RoomSidebar";
 import { ChatPanel } from "./components/ChatPanel";
 import { CreateRoomModal } from "./components/CreateRoomModal";
 import { apiFetch } from "./lib/api";
-import { getSocket } from "./lib/socket";
+import { getSocket, syncSocketAuth } from "./lib/socket";
+import {
+  clearAccessToken,
+  getStoredAccessToken,
+  storeAccessToken
+} from "./lib/session";
 
 export function App() {
   const [user, setUser] = useState<AppUser | null>(null);
@@ -170,10 +175,15 @@ export function App() {
 
   async function bootstrap() {
     try {
+      syncSocketAuth();
       const session = await apiFetch<AuthResponse>("/auth/me");
       setUser(session.user);
       await Promise.all([loadRooms(), loadUsers()]);
     } catch {
+      if (getStoredAccessToken()) {
+        clearAccessToken();
+        syncSocketAuth();
+      }
       setUser(null);
     } finally {
       setLoadingSession(false);
@@ -283,6 +293,11 @@ export function App() {
       body: JSON.stringify(values)
     });
 
+    if (session.token) {
+      storeAccessToken(session.token);
+      syncSocketAuth();
+    }
+
     setUser(session.user);
     await Promise.all([loadRooms(), loadUsers()]);
   }
@@ -334,6 +349,8 @@ export function App() {
     });
 
     getSocket().disconnect();
+    clearAccessToken();
+    syncSocketAuth();
     setUser(null);
     setRooms([]);
     setUsers([]);

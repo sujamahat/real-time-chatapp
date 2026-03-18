@@ -1,3 +1,5 @@
+import { getStoredAccessToken } from "./session";
+
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
 
 export async function apiFetch<T>(
@@ -5,10 +7,12 @@ export async function apiFetch<T>(
   init?: RequestInit
 ): Promise<T> {
   const isFormData = init?.body instanceof FormData;
+  const accessToken = getStoredAccessToken();
   const response = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
       ...(isFormData ? {} : { "Content-Type": "application/json" }),
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...(init?.headers ?? {})
     },
     credentials: "include"

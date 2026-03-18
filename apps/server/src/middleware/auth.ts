@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { prisma } from "../lib/prisma.js";
-import { verifyToken } from "../lib/auth.js";
+import { getTokenFromAuthorizationHeader, verifyToken } from "../lib/auth.js";
 import { env } from "../env.js";
 
 export type AuthenticatedRequest = Request & {
@@ -16,13 +16,20 @@ export function getAuthenticatedUser(request: Request) {
   return (request as Request & AuthenticatedRequest).user;
 }
 
+function getRequestToken(request: Request) {
+  return (
+    request.cookies?.[env.COOKIE_NAME] ??
+    getTokenFromAuthorizationHeader(request.headers.authorization)
+  );
+}
+
 export async function requireAuth(
   request: Request,
   response: Response,
   next: NextFunction
 ) {
   try {
-    const token = request.cookies?.[env.COOKIE_NAME];
+    const token = getRequestToken(request);
 
     if (!token) {
       return response.status(StatusCodes.UNAUTHORIZED).json({

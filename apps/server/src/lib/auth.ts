@@ -27,6 +27,20 @@ export function verifyToken(token: string) {
   return jwt.verify(token, env.JWT_SECRET) as TokenPayload;
 }
 
+export function getTokenFromAuthorizationHeader(headerValue?: string | null) {
+  if (!headerValue) {
+    return null;
+  }
+
+  const [scheme, token] = headerValue.split(" ");
+
+  if (scheme?.toLowerCase() !== "bearer" || !token) {
+    return null;
+  }
+
+  return token;
+}
+
 export function setAuthCookie(response: Response, token: string) {
   response.cookie(env.COOKIE_NAME, token, getCookieOptions());
 }

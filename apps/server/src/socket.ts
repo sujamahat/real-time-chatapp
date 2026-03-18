@@ -3,7 +3,7 @@ import { Server } from "socket.io";
 import cookie from "cookie";
 import { prisma } from "./lib/prisma.js";
 import { env } from "./env.js";
-import { verifyToken } from "./lib/auth.js";
+import { getTokenFromAuthorizationHeader, verifyToken } from "./lib/auth.js";
 import { enforceRateLimit } from "./lib/rateLimit.js";
 import { markRoomAsRead } from "./lib/readReceipts.js";
 import { serializeMessage } from "./lib/serializers.js";
@@ -33,13 +33,15 @@ export function createSocketServer(server: HttpServer) {
   io.use(async (socket, next) => {
     try {
       const cookieHeader = socket.handshake.headers.cookie;
-
-      if (!cookieHeader) {
-        return next(new Error("Authentication required."));
-      }
-
-      const parsedCookie = cookie.parse(cookieHeader);
-      const token = parsedCookie[env.COOKIE_NAME];
+      const parsedCookie = cookieHeader ? cookie.parse(cookieHeader) : {};
+      const socketAuthToken =
+        typeof socket.handshake.auth.token === "string"
+          ? socket.handshake.auth.token
+          : null;
+      const token =
+        parsedCookie[env.COOKIE_NAME] ??
+        socketAuthToken ??
+        getTokenFromAuthorizationHeader(socket.handshake.headers.authorization);
 
       if (!token) {
         return next(new Error("Authentication required."));
