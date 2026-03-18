@@ -9,9 +9,10 @@ type AuthCardProps = {
     name?: string;
     mode: AuthMode;
   }) => Promise<void>;
+  onResetSession: () => void;
 };
 
-export function AuthCard({ onSubmit }: AuthCardProps) {
+export function AuthCard({ onSubmit, onResetSession }: AuthCardProps) {
   const [mode, setMode] = useState<AuthMode>("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -107,6 +108,19 @@ export function AuthCard({ onSubmit }: AuthCardProps) {
               ? "Enter workspace"
               : "Create account"}
         </button>
+
+        <button
+          className="secondary-button"
+          onClick={onResetSession}
+          type="button"
+        >
+          Reset session
+        </button>
+
+        <p className="helper-copy">
+          If the demo accounts ever feel stuck, this clears the saved login state
+          for this browser and lets you start fresh.
+        </p>
       </form>
     </div>
   );

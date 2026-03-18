@@ -190,6 +190,21 @@ export function App() {
     }
   }
 
+  function handleResetSession() {
+    getSocket().disconnect();
+    clearAccessToken();
+    syncSocketAuth();
+    setUser(null);
+    setRooms([]);
+    setUsers([]);
+    setActiveRoomId(null);
+    setMessagesByRoom({});
+    setCursorByRoom({});
+    setTypingByRoom({});
+    setPresenceByUserId({});
+    setCreateRoomError(null);
+  }
+
   async function loadRooms() {
     const data = await apiFetch<{ rooms: ChatRoom[] }>("/rooms");
     setRooms(data.rooms);
@@ -426,7 +441,7 @@ export function App() {
   if (!user) {
     return (
       <main className="app-shell">
-        <AuthCard onSubmit={handleAuth} />
+        <AuthCard onSubmit={handleAuth} onResetSession={handleResetSession} />
       </main>
     );
   }
