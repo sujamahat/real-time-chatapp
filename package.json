@@ -1,0 +1,21 @@
+{
+  "name": "real-time-chatapp",
+  "private": true,
+  "version": "0.0.1",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace @chatapp/server\" \"npm run dev --workspace @chatapp/web\"",
+    "build": "npm run build --workspace @chatapp/server && npm run build --workspace @chatapp/web",
+    "lint": "npm run lint --workspace @chatapp/server && npm run lint --workspace @chatapp/web",
+    "format": "npm run format --workspace @chatapp/server && npm run format --workspace @chatapp/web",
+    "db:generate": "npm run db:generate --workspace @chatapp/server",
+    "db:migrate": "npm run db:migrate --workspace @chatapp/server",
+    "db:seed": "npm run db:seed --workspace @chatapp/server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
