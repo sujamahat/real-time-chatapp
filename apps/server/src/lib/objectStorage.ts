@@ -1,12 +1,12 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import type { Express } from "express";
+import { Client as MinioClient } from "minio";
 import { env } from "../env.js";
 
-let s3Client: S3Client | null = null;
+let objectStorageClient: MinioClient | null = null;
 
-function getS3Client() {
-  if (s3Client) {
-    return s3Client;
+function getObjectStorageClient() {
+  if (objectStorageClient) {
+    return objectStorageClient;
   }
 
   if (
@@ -18,16 +18,36 @@ function getS3Client() {
     throw new Error("S3 storage is enabled but the S3 environment variables are incomplete.");
   }
 
-  s3Client = new S3Client({
+  const endpoint = new URL(env.S3_ENDPOINT);
+  objectStorageClient = new MinioClient({
+    endPoint: endpoint.hostname,
+    port: endpoint.port ? Number(endpoint.port) : undefined,
+    useSSL: endpoint.protocol === "https:",
+    accessKey: env.S3_ACCESS_KEY_ID,
+    secretKey: env.S3_SECRET_ACCESS_KEY,
     region: env.S3_REGION,
-    endpoint: env.S3_ENDPOINT,
-    credentials: {
-      accessKeyId: env.S3_ACCESS_KEY_ID,
-      secretAccessKey: env.S3_SECRET_ACCESS_KEY
-    }
+    pathStyle: true
   });
 
-  return s3Client;
+  return objectStorageClient;
+}
+
+function getRequiredS3Config() {
+  if (
+    !env.S3_BUCKET ||
+    !env.S3_ENDPOINT ||
+    !env.S3_ACCESS_KEY_ID ||
+    !env.S3_SECRET_ACCESS_KEY
+  ) {
+    throw new Error("S3 storage is enabled but the S3 environment variables are incomplete.");
+  }
+
+  return {
+    bucket: env.S3_BUCKET,
+    endpoint: env.S3_ENDPOINT,
+    accessKeyId: env.S3_ACCESS_KEY_ID,
+    secretAccessKey: env.S3_SECRET_ACCESS_KEY
+  };
 }
 
 function sanitizeFileName(fileName: string) {
@@ -35,17 +55,13 @@ function sanitizeFileName(fileName: string) {
 }
 
 export async function uploadToObjectStorage(file: Express.Multer.File) {
-  const client = getS3Client();
+  const config = getRequiredS3Config();
+  const client = getObjectStorageClient();
   const key = `chat-assets/${Date.now()}-${sanitizeFileName(file.originalname)}`;
 
-  await client.send(
-    new PutObjectCommand({
-      Bucket: env.S3_BUCKET,
-      Key: key,
-      Body: file.buffer,
-      ContentType: file.mimetype
-    })
-  );
+  await client.putObject(config.bucket, key, file.buffer, file.size, {
+    "Content-Type": file.mimetype
+  });
 
   const publicBaseUrl = env.S3_PUBLIC_BASE_URL ?? env.S3_ENDPOINT;
   if (!publicBaseUrl) {
@@ -59,4 +75,3 @@ export async function uploadToObjectStorage(file: Express.Multer.File) {
     size: file.size
   };
 }
-

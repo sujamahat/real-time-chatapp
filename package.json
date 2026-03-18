@@ -6,6 +6,9 @@
     "apps/*",
     "packages/*"
   ],
+  "overrides": {
+    "fast-xml-parser": "5.5.6"
+  },
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace @chatapp/server\" \"npm run dev --workspace @chatapp/web\"",
     "build": "npm run build --workspace @chatapp/server && npm run build --workspace @chatapp/web",
