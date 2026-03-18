@@ -31,8 +31,15 @@
 
 ## Live Deployment
 
-- Frontend: https://real-time-chatapp-eight.vercel.app
-- Backend API: https://backend-production-e34e.up.railway.app
+- Frontend: [Pulse Chat](https://real-time-chatapp-eight.vercel.app)
+- Backend API: [Health Check](https://backend-production-e34e.up.railway.app/health)
+
+## Demo Login
+
+Use these credentials to test the live app:
+
+- `demo@chatapp.dev` / `password123`
+- `alex@chatapp.dev` / `password123`
 
 ## Why This Project Stands Out
 
