@@ -41,6 +41,20 @@ Use these credentials to test the live app:
 - `demo@chatapp.dev` / `password123`
 - `alex@chatapp.dev` / `password123`
 
+## How To Test In 30 Seconds
+
+1. Open the live app: [Pulse Chat](https://real-time-chatapp-eight.vercel.app)
+2. Log in with `demo@chatapp.dev` / `password123`
+3. Open the `General` channel and send a message
+4. Open the direct message with Alex Chen to see DMs, unread counts, and receipts
+5. Optionally upload an attachment to test file handling
+
+## Deployment Notes For Reviewers
+
+- The frontend link above is the actual live product UI
+- The backend link in this README points to a health-check endpoint, because the backend is an API service rather than a browser-facing page
+- The project is deployed with Vercel for the frontend and Railway for the backend
+
 ## Why This Project Stands Out
 
 - Real-time messaging powered by Socket.IO
